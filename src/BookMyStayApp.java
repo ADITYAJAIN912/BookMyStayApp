@@ -1,10 +1,10 @@
 import java.util.Scanner;
 
-public class BookMyStayApp{
+public class BookMyStayApp {
 
     // Centralized room inventory
     static String[] roomTypes = {"Single Room", "Double Room", "Deluxe Room", "Suite"};
-    static int[] availableRooms = {10, 5, 3, 2}; // static initial availability
+    static int[] availableRooms = {10, 5, 3, 2}; // initial availability
 
     // Display current availability
     public static void showAvailability() {
@@ -14,53 +14,55 @@ public class BookMyStayApp{
         }
     }
 
-    // Book a room
-    public static boolean bookRoom(int roomIndex, int quantity) {
-        if (roomIndex < 0 || roomIndex >= availableRooms.length) {
-            System.out.println("Invalid room selection.");
-            return false;
-        }
-        if (quantity <= 0) {
-            System.out.println("Invalid quantity.");
-            return false;
-        }
-        if (availableRooms[roomIndex] >= quantity) {
-            availableRooms[roomIndex] -= quantity;
-            System.out.println(quantity + " " + roomTypes[roomIndex] + "(s) booked successfully!");
-            return true;
-        } else {
-            System.out.println("Booking failed! Only " + availableRooms[roomIndex] + " rooms available.");
-            return false;
-        }
-    }
-
     // Search for a room type
-    public static void searchRoom(String searchQuery) {
-        boolean found = false;
-        System.out.println("\nSearch Results:");
+    public static int searchRoom(String query) {
         for (int i = 0; i < roomTypes.length; i++) {
-            if (roomTypes[i].toLowerCase().contains(searchQuery.toLowerCase())) {
-                System.out.println(roomTypes[i] + " - " + availableRooms[i] + " rooms available");
-                found = true;
+            if (roomTypes[i].toLowerCase().contains(query.toLowerCase())) {
+                return i; // return index of first match
             }
         }
-        if (!found) {
-            System.out.println("No room types match your search query: \"" + searchQuery + "\"");
+        return -1; // not found
+    }
+
+    // Handle booking request
+    public static void handleBookingRequest(Scanner sc) {
+        System.out.print("Enter room type you want to book: ");
+        String roomQuery = sc.nextLine();
+
+        int roomIndex = searchRoom(roomQuery);
+        if (roomIndex == -1) {
+            System.out.println("Room type not found. Please try again.");
+            return;
+        }
+
+        System.out.println(roomTypes[roomIndex] + " - " + availableRooms[roomIndex] + " rooms available.");
+        System.out.print("Enter number of rooms to book: ");
+        int qty = sc.nextInt();
+        sc.nextLine(); // consume newline
+
+        if (qty <= 0) {
+            System.out.println("Invalid quantity.");
+            return;
+        }
+
+        if (availableRooms[roomIndex] >= qty) {
+            availableRooms[roomIndex] -= qty;
+            System.out.println("Booking confirmed! " + qty + " " + roomTypes[roomIndex] + "(s) booked successfully.");
+        } else {
+            System.out.println("Booking failed! Only " + availableRooms[roomIndex] + " rooms available.");
         }
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Welcome to Book My Stay - Room Search & Availability Check");
+        System.out.println("Welcome to Book My Stay - Booking Request");
 
         boolean running = true;
-
         while (running) {
             System.out.println("\nMenu:");
             System.out.println("1. Show Room Availability");
-            System.out.println("2. Book a Room");
-            System.out.println("3. Search for a Room Type");
-            System.out.println("4. Exit");
+            System.out.println("2. Make a Booking Request");
+            System.out.println("3. Exit");
 
             System.out.print("Enter your choice: ");
             int choice = sc.nextInt();
@@ -71,24 +73,14 @@ public class BookMyStayApp{
                     showAvailability();
                     break;
                 case 2:
-                    showAvailability();
-                    System.out.print("Select room number to book: ");
-                    int roomNum = sc.nextInt() - 1;
-                    System.out.print("Enter quantity to book: ");
-                    int qty = sc.nextInt();
-                    bookRoom(roomNum, qty);
+                    handleBookingRequest(sc);
                     break;
                 case 3:
-                    System.out.print("Enter room type to search: ");
-                    String query = sc.nextLine();
-                    searchRoom(query);
-                    break;
-                case 4:
                     running = false;
                     System.out.println("Thank you for using Book My Stay!");
                     break;
                 default:
-                    System.out.println("Invalid choice. Try again.");
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
 
