@@ -1,122 +1,111 @@
-import java.util.Scanner;
+import java.util.*;
 
-public class BookMyStayApp {
+/**
+ * Book My Stay App
+ * Version: 8.0
+ * Description:
+ * Maintains booking history and generates reports.
+ */
 
-    // Room inventory
-    static String[] roomTypes = {"Single Room", "Double Room", "Deluxe Room", "Suite"};
-    static int[] availableRooms = {10, 5, 3, 2};
-    static int[] nextRoomNumber = {101, 201, 301, 401};
+// -------------------- RESERVATION MODEL --------------------
 
-    // Available add-on services
-    static String[] services = {"Breakfast", "Airport Pickup", "Spa Access", "Extra Bed"};
+class BookMyStayApp {
 
-    // Display room availability
-    public static void showAvailability() {
-        System.out.println("\nCurrent Room Availability:");
-        for (int i = 0; i < roomTypes.length; i++) {
-            System.out.println((i + 1) + ". " + roomTypes[i] + " - " + availableRooms[i] + " rooms available");
-        }
+    private String reservationId;
+    private String guestName;
+    private String roomType;
+
+    public Reservation(String reservationId, String guestName, String roomType) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 
-    // Search room
-    public static int searchRoom(String query) {
-        for (int i = 0; i < roomTypes.length; i++) {
-            if (roomTypes[i].toLowerCase().contains(query.toLowerCase())) {
-                return i;
-            }
-        }
-        return -1;
+    public String getReservationId() {
+        return reservationId;
     }
 
-    // Handle booking with add-on services
-    public static void handleBooking(Scanner sc) {
-        System.out.print("Enter room type to book: ");
-        String roomQuery = sc.nextLine();
-
-        int roomIndex = searchRoom(roomQuery);
-        if (roomIndex == -1) {
-            System.out.println("Room type not found.");
-            return;
-        }
-
-        System.out.println(roomTypes[roomIndex] + " - " + availableRooms[roomIndex] + " rooms available.");
-        System.out.print("Enter number of rooms to book: ");
-        int qty = sc.nextInt();
-        sc.nextLine(); // consume newline
-
-        if (qty <= 0) {
-            System.out.println("Invalid quantity.");
-            return;
-        }
-
-        if (availableRooms[roomIndex] >= qty) {
-            // Allocate rooms
-            System.out.println("Booking Confirmed! Your allocated room numbers:");
-            for (int i = 0; i < qty; i++) {
-                System.out.print(nextRoomNumber[roomIndex] + " ");
-                nextRoomNumber[roomIndex]++;
-            }
-            System.out.println();
-
-            // Update inventory
-            availableRooms[roomIndex] -= qty;
-
-            // Add-on services selection
-            System.out.println("\nAvailable Add-On Services:");
-            for (int i = 0; i < services.length; i++) {
-                System.out.println((i + 1) + ". " + services[i]);
-            }
-            System.out.print("Enter the numbers of the services you want (comma-separated, e.g., 1,3) or 0 for none: ");
-            String input = sc.nextLine();
-            if (!input.equals("0")) {
-                String[] selected = input.split(",");
-                System.out.println("You selected the following add-on services:");
-                for (String s : selected) {
-                    int index = Integer.parseInt(s.trim()) - 1;
-                    if (index >= 0 && index < services.length) {
-                        System.out.println("- " + services[index]);
-                    }
-                }
-            } else {
-                System.out.println("No add-on services selected.");
-            }
-
-        } else {
-            System.out.println("Booking failed! Only " + availableRooms[roomIndex] + " rooms available.");
-        }
+    public String getGuestName() {
+        return guestName;
     }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation ID: " + reservationId +
+                " | Guest: " + guestName +
+                " | Room: " + roomType;
+    }
+}
+
+// -------------------- BOOKING HISTORY --------------------
+
+class BookingHistory {
+
+    private List<Reservation> reservationHistory;
+
+    public BookingHistory() {
+        reservationHistory = new ArrayList<>();
+    }
+
+    // store confirmed booking
+    public void addReservation(Reservation reservation) {
+        reservationHistory.add(reservation);
+        System.out.println("Reservation stored in history -> " + reservation.getReservationId());
+    }
+
+    public List<Reservation> getAllReservations() {
+        return reservationHistory;
+    }
+}
+
+// -------------------- REPORT SERVICE --------------------
+
+class BookingReportService {
+
+    public void generateReport(List<Reservation> reservations) {
+
+        System.out.println("\n---- Booking History Report ----\n");
+
+        for (Reservation r : reservations) {
+            System.out.println(r);
+        }
+
+        System.out.println("\nTotal Bookings: " + reservations.size());
+    }
+}
+
+// -------------------- APPLICATION ENTRY --------------------
+
+public class StayApp {
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Welcome to Book My Stay - Booking with Add-On Services");
 
-        boolean running = true;
-        while (running) {
-            System.out.println("\nMenu:");
-            System.out.println("1. Show Room Availability");
-            System.out.println("2. Book & Select Add-On Services");
-            System.out.println("3. Exit");
+        System.out.println("===============================================");
+        System.out.println("Book My Stay - Hotel Booking Management System");
+        System.out.println("Version 8.0");
+        System.out.println("Booking History & Reporting");
+        System.out.println("===============================================");
 
-            System.out.print("Enter your choice: ");
-            int choice = sc.nextInt();
-            sc.nextLine(); // consume newline
+        BookingHistory history = new BookingHistory();
+        BookingReportService reportService = new BookingReportService();
 
-            switch (choice) {
-                case 1:
-                    showAvailability();
-                    break;
-                case 2:
-                    handleBooking(sc);
-                    break;
-                case 3:
-                    running = false;
-                    System.out.println("Thank you for using Book My Stay!");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Try again.");
-            }
-        }
+        // Simulated confirmed reservations
+        Reservation r1 = new Reservation("R101", "Alice", "Single Room");
+        Reservation r2 = new Reservation("R102", "Bob", "Suite Room");
+        Reservation r3 = new Reservation("R103", "Charlie", "Double Room");
 
-        sc.close();
+        // store in history
+        history.addReservation(r1);
+        history.addReservation(r2);
+        history.addReservation(r3);
+
+        // admin generates report
+        reportService.generateReport(history.getAllReservations());
+
+        System.out.println("\n===============================================");
     }
 }
