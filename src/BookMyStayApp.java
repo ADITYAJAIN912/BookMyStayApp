@@ -2,15 +2,15 @@ import java.util.Scanner;
 
 public class BookMyStayApp {
 
-    // Centralized inventory with total rooms
+    // Room inventory
     static String[] roomTypes = {"Single Room", "Double Room", "Deluxe Room", "Suite"};
-    static int[] totalRooms = {10, 5, 3, 2};
     static int[] availableRooms = {10, 5, 3, 2};
-
-    // Starting room numbers for each type
     static int[] nextRoomNumber = {101, 201, 301, 401};
 
-    // Display availability
+    // Available add-on services
+    static String[] services = {"Breakfast", "Airport Pickup", "Spa Access", "Extra Bed"};
+
+    // Display room availability
     public static void showAvailability() {
         System.out.println("\nCurrent Room Availability:");
         for (int i = 0; i < roomTypes.length; i++) {
@@ -18,17 +18,17 @@ public class BookMyStayApp {
         }
     }
 
-    // Search room index
+    // Search room
     public static int searchRoom(String query) {
         for (int i = 0; i < roomTypes.length; i++) {
             if (roomTypes[i].toLowerCase().contains(query.toLowerCase())) {
                 return i;
             }
         }
-        return -1; // Not found
+        return -1;
     }
 
-    // Handle booking and allocate room numbers
+    // Handle booking with add-on services
     public static void handleBooking(Scanner sc) {
         System.out.print("Enter room type to book: ");
         String roomQuery = sc.nextLine();
@@ -50,7 +50,7 @@ public class BookMyStayApp {
         }
 
         if (availableRooms[roomIndex] >= qty) {
-            // Allocate room numbers
+            // Allocate rooms
             System.out.println("Booking Confirmed! Your allocated room numbers:");
             for (int i = 0; i < qty; i++) {
                 System.out.print(nextRoomNumber[roomIndex] + " ");
@@ -58,8 +58,29 @@ public class BookMyStayApp {
             }
             System.out.println();
 
-            // Update availability
+            // Update inventory
             availableRooms[roomIndex] -= qty;
+
+            // Add-on services selection
+            System.out.println("\nAvailable Add-On Services:");
+            for (int i = 0; i < services.length; i++) {
+                System.out.println((i + 1) + ". " + services[i]);
+            }
+            System.out.print("Enter the numbers of the services you want (comma-separated, e.g., 1,3) or 0 for none: ");
+            String input = sc.nextLine();
+            if (!input.equals("0")) {
+                String[] selected = input.split(",");
+                System.out.println("You selected the following add-on services:");
+                for (String s : selected) {
+                    int index = Integer.parseInt(s.trim()) - 1;
+                    if (index >= 0 && index < services.length) {
+                        System.out.println("- " + services[index]);
+                    }
+                }
+            } else {
+                System.out.println("No add-on services selected.");
+            }
+
         } else {
             System.out.println("Booking failed! Only " + availableRooms[roomIndex] + " rooms available.");
         }
@@ -67,13 +88,13 @@ public class BookMyStayApp {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Welcome to Book My Stay - Reservation Confirmation & Room Allocation");
+        System.out.println("Welcome to Book My Stay - Booking with Add-On Services");
 
         boolean running = true;
         while (running) {
             System.out.println("\nMenu:");
             System.out.println("1. Show Room Availability");
-            System.out.println("2. Book & Allocate Rooms");
+            System.out.println("2. Book & Select Add-On Services");
             System.out.println("3. Exit");
 
             System.out.print("Enter your choice: ");
